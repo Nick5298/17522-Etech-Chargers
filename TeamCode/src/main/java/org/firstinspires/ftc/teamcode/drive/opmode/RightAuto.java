@@ -36,18 +36,18 @@ public class RightAuto extends LinearOpMode {
     private int scoreslide = 695;
 
     // arm angle to grab //increase to be higher off ground, decrease to be lower
-    int entryVal1 = 376+15;
-    int entryVal2 = 360+15;
-    int entryVal3 = 342+15;
-    int entryVal4 = 322+15;
+    int entryVal1 = 376+15+3;
+    int entryVal2 = 360+15+6;
+    int entryVal3 = 342+15+5;
+    int entryVal4 = 322+15+10;
     int EntryVal5 = 313+15;
 
     //the amount the slide reaches //increase/decrease by small numbers, increase to reach further, decrease to reach less far
-    private int reach1 = 684;
-    private int reach2 = 700;
-    private int reach3 = 710;
-    private int reach4 = 723;
-    private int reach5 = 738;
+    private int reach1 = 684-5;
+    private int reach2 = 700-5;
+    private int reach3 = 710-5;
+    private int reach4 = 723-5;
+    private int reach5 = 738-10;
 
     double servoinpulses = 20.0 / 41793;
     public DcMotor Arm;
@@ -250,7 +250,7 @@ public class RightAuto extends LinearOpMode {
 
                     })
                     .UNSTABLE_addTemporalMarkerOffset(0.3,() -> {
-                        armset(scorepivot+10,1);
+                        armset(scorepivot+2,1);
 
                     })
                     .waitSeconds(0.5)
@@ -292,7 +292,7 @@ public class RightAuto extends LinearOpMode {
                     //
                     //FINISH LINE
                     .UNSTABLE_addTemporalMarkerOffset(-1,() -> {
-                        armset(preppivot-5,1);
+                        armset(preppivot,1);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(-0.7,() -> {
                         slideset(scoreslide,1);
@@ -390,14 +390,14 @@ public class RightAuto extends LinearOpMode {
                     //
                     //FINISH
                     .UNSTABLE_addTemporalMarkerOffset(-1,() -> {
-                        armset(preppivot,1);
+                        armset(preppivot-2,1);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(-0.7,() -> {
                         slideset(scoreslide,1);
 
                     })
                     .UNSTABLE_addTemporalMarkerOffset(0.1,() -> {
-                        armset(scorepivot,1);
+                        armset(scorepivot-2,1);
 
                     })
                     .waitSeconds(0.3)
@@ -446,7 +446,7 @@ public class RightAuto extends LinearOpMode {
 
                     })
                     .UNSTABLE_addTemporalMarkerOffset(0.1,() -> {
-                        armset(scorepivot,1);
+                        armset(scorepivot-10,1);
 
                     })
                     .waitSeconds(0.3)
