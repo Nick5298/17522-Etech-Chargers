@@ -31,23 +31,23 @@ public class RightAuto extends LinearOpMode {
     //the prep pivot amount //to clear the pole when extending, keep this number lower than the score pivot amount // decrease to be further from the pole, increase to be closer
     private int preppivot =1220;
     //the score pivot amount //increase to be further over the pole, decrease to be less over the pole
-    private int scorepivot = 1275;
+    private int scorepivot = 1275+4;
     //the amount the slide extends when scoring //increase to reach out more, decrease to reach out less
     private int scoreslide = 695;
 
     // arm angle to grab //increase to be higher off ground, decrease to be lower
-    int entryVal1 = 376+15+3;
-    int entryVal2 = 360+15+6;
-    int entryVal3 = 342+15+5;
-    int entryVal4 = 322+15+10;
+    int entryVal1 = 376+15+1;
+    int entryVal2 = 360+15+3;
+    int entryVal3 = 342+15+4;
+    int entryVal4 = 322+15+4;
     int EntryVal5 = 313+15;
 
     //the amount the slide reaches //increase/decrease by small numbers, increase to reach further, decrease to reach less far
-    private int reach1 = 684-5;
+    private int reach1 = 684-6;
     private int reach2 = 700-5;
-    private int reach3 = 710-5;
-    private int reach4 = 723-5;
-    private int reach5 = 738-10;
+    private int reach3 = 710-2;
+    private int reach4 = 723-6;
+    private int reach5 = 738-3;
 
     double servoinpulses = 20.0 / 41793;
     public DcMotor Arm;
@@ -235,9 +235,9 @@ public class RightAuto extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(36, 0, (Math.toRadians(-13.5))))
 
                     .addDisplacementMarker(20, () -> {
-                    slide.setTargetPosition(0);
-                    slide.setPower(1);
-                    slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        slide.setTargetPosition(0);
+                        slide.setPower(1);
+                        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                     })
 
@@ -250,7 +250,7 @@ public class RightAuto extends LinearOpMode {
 
                     })
                     .UNSTABLE_addTemporalMarkerOffset(0.3,() -> {
-                        armset(scorepivot+2,1);
+                        armset(scorepivot+10,1);
 
                     })
                     .waitSeconds(0.5)
@@ -292,7 +292,7 @@ public class RightAuto extends LinearOpMode {
                     //
                     //FINISH LINE
                     .UNSTABLE_addTemporalMarkerOffset(-1,() -> {
-                        armset(preppivot,1);
+                        armset(preppivot-5,1);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(-0.7,() -> {
                         slideset(scoreslide,1);
@@ -390,14 +390,14 @@ public class RightAuto extends LinearOpMode {
                     //
                     //FINISH
                     .UNSTABLE_addTemporalMarkerOffset(-1,() -> {
-                        armset(preppivot-2,1);
+                        armset(preppivot,1);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(-0.7,() -> {
                         slideset(scoreslide,1);
 
                     })
                     .UNSTABLE_addTemporalMarkerOffset(0.1,() -> {
-                        armset(scorepivot-2,1);
+                        armset(scorepivot,1);
 
                     })
                     .waitSeconds(0.3)
@@ -446,7 +446,7 @@ public class RightAuto extends LinearOpMode {
 
                     })
                     .UNSTABLE_addTemporalMarkerOffset(0.1,() -> {
-                        armset(scorepivot-10,1);
+                        armset(scorepivot,1);
 
                     })
                     .waitSeconds(0.3)
