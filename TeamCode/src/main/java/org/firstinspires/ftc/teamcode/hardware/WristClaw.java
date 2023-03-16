@@ -1,33 +1,50 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.apache.commons.math3.analysis.function.Max;
 import org.apache.commons.math3.analysis.function.Min;
-
+@Config
 public class WristClaw extends Mechanism {
     //Parts
     Servo claw, wrist;
 
     //Physical Constants
-    public double MAX_WRIST_ANGLE = 270; //deg
-    public double MAX_CLAW_POSITION = 1;
-    public double MIN_CLAW_POSITION = 0;
+    public static double MAX_WRIST_ANGLE = 90; //deg
+    public static double MIN_WRIST_ANGLE = -135;
+    public static double MAX_CLAW_POSITION = 0.75;
+    public static double MIN_CLAW_POSITION = 0.25;
+    public static double WRIST_PITCH = 10; //deg
 
     //Current Claw/Wrist position for hardware write optimization
     public double clawPos;
     public double wristPos;
 
-    //wrist init position
+    //wrist positions
     public static double INIT_ANGLE = 0;
 
     @Override
     public void init(HardwareMap hwMap) {
         claw = hwMap.get(Servo.class, "claw");
         wrist = hwMap.get(Servo.class, "wrist");
-        setWristAngle(INIT_ANGLE);
+    }
+
+    public void init(HardwareMap hwMap, double angle) {
+        init(hwMap);
+        setWristAngle(angle);
+        openClaw();
+    }
+
+    public void toggleClaw() {
+        if(clawPos == MAX_CLAW_POSITION) {
+            closeClaw();
+        }
+        if(clawPos == MIN_CLAW_POSITION) {
+            openClaw();
+        }
     }
 
     public void openClaw() {
@@ -38,13 +55,16 @@ public class WristClaw extends Mechanism {
         setClawPosition(MIN_CLAW_POSITION);
     }
 
-    //degrees only
-    public void setWristAngle(double angle) {
-        angle = Range.clip(angle, -MAX_WRIST_ANGLE, MAX_WRIST_ANGLE);
-        angle = Range.scale(angle, -MAX_WRIST_ANGLE, MAX_WRIST_ANGLE, 0, 1);
-        setWristPosition(angle);
+    public void wristPitch(double angle) {
+        setWristAngle(angle - WRIST_PITCH);
     }
 
+    //degrees only
+    public void setWristAngle(double angle) {
+        angle = Range.clip(angle, MIN_WRIST_ANGLE, MAX_WRIST_ANGLE);
+        angle = Range.scale(angle, MIN_WRIST_ANGLE, MAX_WRIST_ANGLE, 0, 0.88);
+        setWristPosition(angle);
+    }
 
     //avoid redundant hardware writes
     public void setClawPosition(double position) {
