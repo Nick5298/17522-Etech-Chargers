@@ -21,6 +21,8 @@ public class PivotSlide extends Mechanism {
     //Current Power/Pos for parts for hardware write optimization
     public double pivotPower;
     public double slidePower;
+    public double slide_currentPos;
+    public double pivot_currentPos;
 
     //Physical Constants
     public static double SLIDE_TICKS_PER_REV = 145.1;
@@ -97,11 +99,11 @@ public class PivotSlide extends Mechanism {
 
     public void slideUpdate() {
         double time = slideTimer.milliseconds();
-        double currentPos = slide.getCurrentPosition();
-        double error = slide_target - currentPos;
+        slide_currentPos = slide.getCurrentPosition();
+        double error = slide_target - slide_currentPos;
         double proportional = error * slide_kP;
         double derivative = (error - slide_lastError) / time * slide_kD;
-        double antigravity = Math.sin(Math.toRadians(getPivotAngle())) * slide_kG * currentPos/ MAX;
+        double antigravity = Math.sin(Math.toRadians(getPivotAngle())) * slide_kG * slide_currentPos / MAX;
         double power = Range.clip(
                 proportional + derivative + antigravity,
                 -1, 1);
@@ -116,7 +118,8 @@ public class PivotSlide extends Mechanism {
 
     public void pivotUpdate() {
         double time = pivotTimer.milliseconds();
-        double error = pivot_target - pivot.getCurrentPosition();
+        pivot_currentPos = pivot.getCurrentPosition();
+        double error = pivot_target - pivot_currentPos;
         double proportional = error * pivot_kP;
         double derivative = (error - pivot_lastError) / time * pivot_kD;
         double antigravity = Math.cos(Math.toRadians(getPivotAngle())) * pivot_kG_retracted;
@@ -130,6 +133,16 @@ public class PivotSlide extends Mechanism {
         slide_lastError = error;
         slideTimer.reset();
         setPivotPower(power);
+    }
+
+    public boolean isSlideReached() {
+        double error = slide_target - slide_currentPos;
+        return Math.abs(error) <= slide_errorBound;
+    }
+
+    public boolean isPivotReached() {
+        double error = pivot_target - pivot_currentPos;
+        return Math.abs(error) <= pivot_errorBound;
     }
 
     public void setSlidePower(double power) {
@@ -165,6 +178,12 @@ public class PivotSlide extends Mechanism {
         pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+
+    //arm angle in degrees
+    public double getPivotAngle() {
+        return pivot.getCurrentPosition() / PIVOT_TICKS_PER_REV * 360 + PIVOT_START_ANGLE;
+    }
+
     //make interpolation of arm anti grav
     public void initInterpolator(Double[] x, Double[] y) {
         List<Double> pivotKGvalues = Arrays.asList(y);
@@ -177,10 +196,6 @@ public class PivotSlide extends Mechanism {
         return SLIDE_PULLEY_RADIUS * Math.PI * ticks / SLIDE_TICKS_PER_REV;
     }
 
-    //arm angle in degrees
-    public double getPivotAngle() {
-        return pivot.getCurrentPosition() / PIVOT_TICKS_PER_REV * 360 + PIVOT_START_ANGLE;
-    }
 
     public double angleToPos(double angle) {
         return PIVOT_TICKS_PER_REV * (angle - PIVOT_START_ANGLE) / 360;

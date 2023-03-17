@@ -83,8 +83,7 @@ public class ScoreMech extends Mechanism {
             pivotTarget = PivotSlide.GRAB_ANGLE;
             queuedState = scoreStates.GRAB;
             currentState = scoreStates.SLIDE_PREP;
-        }
-        if(currentState == scoreStates.GRAB) {
+        }else {
             pivotTarget = PivotSlide.PIVOT_START_ANGLE;
             queuedState = scoreStates.IDLE;
             currentState = scoreStates.SLIDE_PREP;
@@ -92,7 +91,7 @@ public class ScoreMech extends Mechanism {
     }
 
     public void toggleClaw() {
-        if(currentState == scoreStates.GRAB) {
+        if(currentState == scoreStates.GRAB || currentState == scoreStates.IDLE) {
             wristClaw.toggleClaw();
         }
         if(currentState == scoreStates.READY) {
