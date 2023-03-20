@@ -13,18 +13,19 @@ public class WristClaw extends Mechanism {
     Servo claw, wrist;
 
     //Physical Constants
-    public static double MAX_WRIST_ANGLE = 90; //deg
-    public static double MIN_WRIST_ANGLE = -135;
-    public static double MAX_CLAW_POSITION = 0.75;
-    public static double MIN_CLAW_POSITION = 0.25;
+    public static double MAX_WRIST_ANGLE = 47.8; //deg
+    public static double MIN_WRIST_ANGLE = -222.2;
+    public static double MAX_CLAW_POSITION = 0.5;
+    public static double MIN_CLAW_POSITION = 0.32;
     public static double WRIST_PITCH = 10; //deg
+    public static double CONE_STACK_PITCH = 47.8; //deg
 
     //Current Claw/Wrist position for hardware write optimization
     public double clawPos;
     public double wristPos;
 
-    //wrist positions
-    public static double INIT_ANGLE = 0;
+    //for toggle usage
+    public static boolean isOpen = true;
 
     @Override
     public void init(HardwareMap hwMap) {
@@ -39,30 +40,35 @@ public class WristClaw extends Mechanism {
     }
 
     public void toggleClaw() {
-        if(clawPos == MAX_CLAW_POSITION) {
+        if(isOpen) {
             closeClaw();
-        }
-        if(clawPos == MIN_CLAW_POSITION) {
+        }else {
             openClaw();
         }
     }
 
     public void openClaw() {
         setClawPosition(MAX_CLAW_POSITION);
+        isOpen = true;
     }
 
     public void closeClaw() {
         setClawPosition(MIN_CLAW_POSITION);
+        isOpen = false;
     }
 
     public void wristPitch(double angle) {
         setWristAngle(angle - WRIST_PITCH);
     }
 
+    public void coneStackPitch() {
+        setWristAngle(CONE_STACK_PITCH);
+    }
+
     //degrees only
     public void setWristAngle(double angle) {
         angle = Range.clip(angle, MIN_WRIST_ANGLE, MAX_WRIST_ANGLE);
-        angle = Range.scale(angle, MIN_WRIST_ANGLE, MAX_WRIST_ANGLE, 0, 0.88);
+        angle = Range.scale(angle, MIN_WRIST_ANGLE, MAX_WRIST_ANGLE, 0, 1);
         setWristPosition(angle);
     }
 

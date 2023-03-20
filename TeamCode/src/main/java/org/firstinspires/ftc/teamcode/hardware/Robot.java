@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 @Config
 public class Robot extends Mechanism {
 
-    ScoreMech scoring = new ScoreMech();
-    SampleMecanumDrive drive;
+    public ScoreMech scoring = new ScoreMech();
+    public SampleMecanumDrive drive;
 
     public static double driveMultiplier = 0.5;
     public boolean isPressedA,

@@ -37,36 +37,34 @@ public class PivotSlide extends Mechanism {
     public static double MID = 335;
 
     //Pivot positions
-    public static double GRAB_ANGLE = -30;
-    public static double TELEOP_SCORE_ANGLE = 45;
-    public static double AUTO_SCORE_ANGLE = 45;
+    public static double GRAB_ANGLE = -7;
+    public static double TELEOP_SCORE_ANGLE = 135;
+    public static double AUTO_SCORE_ANGLE = 135;
 
     //PID Stuff //kG interpolate it based on length
-    public static double slide_kP = 0.0035;
+    public static double slide_kP = 0.005;
     public static double slide_kD = 0;
-    public static double slide_kG = 0.4; //high kG
+    public static double slide_kG = 0.55; //high kG
+    public static double slide_kG_2 = -0.2; //helps slides come back if angle < 0
     public static double slide_target = 0;
     public static double slide_lastError = 0;
-    public static double slide_errorBound = 10;
+    public static double slide_errorBound = 15;
+    public static double slide_retractionMultiplier = 0.7;
     public boolean slide_isReached = false;
 
-    public static double pivot_kP = 0.002;
-    public static double pivot_kD = 0.1;
+    public static double pivot_kP = 0.00275;
+    public static double pivot_kD = 0.07;
     public static double pivot_target = 0;
     public static double pivot_lastError = 0;
-    public static double pivot_kG_retracted = 0.03;
-    public static double pivot_kG_mid = 0.03;
-    public static double pivot_kG_extended = 0.03;
-    public static double pivot_errorBound = 2;
+    public static double pivot_kG = 0.02;
+    public static double pivot_kG_slope = 0.00025; //i love lerp
+    public static double pivot_errorBound = 10;
     public boolean pivot_isReached = false;
     SplineInterpolator pivotAntiGrav;
 
 
     @Override
     public void init(HardwareMap hwMap) {
-        initInterpolator(
-                new Double[] {LOW, MID, MAX},
-                new Double[] {pivot_kG_retracted, pivot_kG_mid, pivot_kG_extended});
         slide = hwMap.get(DcMotorEx.class, "slide");
         pivot = hwMap.get(DcMotorEx.class, "pivot");
         reset();
@@ -103,13 +101,24 @@ public class PivotSlide extends Mechanism {
         double error = slide_target - slide_currentPos;
         double proportional = error * slide_kP;
         double derivative = (error - slide_lastError) / time * slide_kD;
-        double antigravity = Math.sin(Math.toRadians(getPivotAngle())) * slide_kG * slide_currentPos / MAX;
-        double power = Range.clip(
-                proportional + derivative + antigravity,
-                -1, 1);
+        double pivotAngle = Math.toRadians(getPivotAngle());
+        double antigravity = Math.sin(pivotAngle) * slide_kG * slide_target / MAX;
+        double power = proportional + derivative;
+        if(pivotAngle > 0) {
+            power += antigravity;
+        }
         if(Math.abs(error) < slide_errorBound) {
-            power = antigravity;
+            if(pivotAngle > 0) {
+                power = antigravity;
+            }
             slide_isReached = true;
+        }
+        if(slide_target == 0) {
+            if(pivotAngle > 0) {
+                power *= (slide_retractionMultiplier + (1 - slide_retractionMultiplier) * Math.cos(pivotAngle));
+            }else {
+                power += slide_kG_2;
+            }
         }
         slide_lastError = error;
         slideTimer.reset();
@@ -122,7 +131,7 @@ public class PivotSlide extends Mechanism {
         double error = pivot_target - pivot_currentPos;
         double proportional = error * pivot_kP;
         double derivative = (error - pivot_lastError) / time * pivot_kD;
-        double antigravity = Math.cos(Math.toRadians(getPivotAngle())) * pivot_kG_retracted;
+        double antigravity = Math.cos(Math.toRadians(getPivotAngle())) * (pivot_kG + pivot_kG_slope * slide_target);
         double power = Range.clip(
                 proportional + derivative + antigravity,
                 -1, 1);
@@ -130,8 +139,8 @@ public class PivotSlide extends Mechanism {
             power = antigravity;
             pivot_isReached = true;
         }
-        slide_lastError = error;
-        slideTimer.reset();
+        pivot_lastError = error;
+        pivotTimer.reset();
         setPivotPower(power);
     }
 
@@ -182,6 +191,10 @@ public class PivotSlide extends Mechanism {
     //arm angle in degrees
     public double getPivotAngle() {
         return pivot.getCurrentPosition() / PIVOT_TICKS_PER_REV * 360 + PIVOT_START_ANGLE;
+    }
+
+    public double getSlideTicks() {
+        return slide.getCurrentPosition();
     }
 
     //make interpolation of arm anti grav

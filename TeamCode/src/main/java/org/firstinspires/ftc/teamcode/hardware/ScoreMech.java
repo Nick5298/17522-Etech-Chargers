@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Config
 public class ScoreMech extends Mechanism {
 
-    PivotSlide pivotSlide = new PivotSlide();
+    public PivotSlide pivotSlide = new PivotSlide();
     WristClaw wristClaw = new WristClaw();
     ElapsedTime dropTimer = new ElapsedTime();
 
@@ -25,6 +25,9 @@ public class ScoreMech extends Mechanism {
     public static double slideTarget = 0;
     public static double pivotTarget = 0;
 
+    public static boolean wristOverride = false;
+    public static double armRaise = 5;
+
     @Override
     public void init(HardwareMap hwMap) {
         pivotSlide.init(hwMap);
@@ -38,10 +41,12 @@ public class ScoreMech extends Mechanism {
             case PIVOT_PREP:
                 pivotSlide.setPivotAngle(pivotTarget); //setting the angle sets isReached to false
                 if(pivotSlide.pivot_isReached) { //isReached becomes true when the error is within a certain defined error bound
+                    pivotSlide.resetSlide();
                     currentState = queuedState; //set FSM state to the state we want, either IDLE or GRAB
                 }
                 break;
             case SLIDE_PREP:
+                wristOverride = false;
                 pivotSlide.setSlideTarget(0); //we only ever come to this state from GRAB or IDLE, and we should retract before we pivot
                 if(pivotSlide.slide_isReached) { //set to false when slide target is set, true when error is within bound
                     currentState = scoreStates.PIVOT_PREP; //time to turn the pivot
@@ -59,10 +64,14 @@ public class ScoreMech extends Mechanism {
                 }
                 break;
             case IDLE:
+                pivotSlide.setSlideTarget(0);
                 break;
         }
         if(currentState == scoreStates.READY) {
             wristClaw.wristPitch(-pivotSlide.getPivotAngle()); //wrist pitch for easier cone scoring
+        }else if(wristOverride){
+            wristClaw.coneStackPitch(); //conestack
+            pivotSlide.setPivotAngle(pivotTarget+armRaise);
         }else {
             wristClaw.setWristAngle(-pivotSlide.getPivotAngle()); //wireless 4 bar to keep wrist parallel to ground
         }
@@ -72,6 +81,7 @@ public class ScoreMech extends Mechanism {
     public void ready(double position) {
         slideTarget = position;
         if(currentState != scoreStates.READY) {
+            wristClaw.closeClaw();
             pivotTarget = PivotSlide.TELEOP_SCORE_ANGLE;
             queuedState = scoreStates.READY;
             currentState = scoreStates.SLIDE_PREP;
@@ -89,6 +99,8 @@ public class ScoreMech extends Mechanism {
             currentState = scoreStates.SLIDE_PREP;
         }
     }
+
+
 
     public void toggleClaw() {
         if(currentState == scoreStates.GRAB || currentState == scoreStates.IDLE) {
