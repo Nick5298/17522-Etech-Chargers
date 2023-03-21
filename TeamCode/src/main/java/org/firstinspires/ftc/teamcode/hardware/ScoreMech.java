@@ -26,7 +26,6 @@ public class ScoreMech extends Mechanism {
     public static double pivotTarget = 0;
 
     public static boolean wristOverride = false;
-    public static double armRaise = 5;
 
     @Override
     public void init(HardwareMap hwMap) {
@@ -71,7 +70,6 @@ public class ScoreMech extends Mechanism {
             wristClaw.wristPitch(-pivotSlide.getPivotAngle()); //wrist pitch for easier cone scoring
         }else if(wristOverride){
             wristClaw.coneStackPitch(); //conestack
-            pivotSlide.setPivotAngle(pivotTarget+armRaise);
         }else {
             wristClaw.setWristAngle(-pivotSlide.getPivotAngle()); //wireless 4 bar to keep wrist parallel to ground
         }

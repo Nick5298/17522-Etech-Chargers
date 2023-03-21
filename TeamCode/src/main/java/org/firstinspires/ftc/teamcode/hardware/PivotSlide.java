@@ -45,7 +45,7 @@ public class PivotSlide extends Mechanism {
     public static double slide_kP = 0.005;
     public static double slide_kD = 0;
     public static double slide_kG = 0.55; //high kG
-    public static double slide_kG_2 = -0.2; //helps slides come back if angle < 0
+    public static double slide_kG_2 = -0.15; //helps slides come back if angle < 0
     public static double slide_target = 0;
     public static double slide_lastError = 0;
     public static double slide_errorBound = 15;
@@ -53,12 +53,13 @@ public class PivotSlide extends Mechanism {
     public boolean slide_isReached = false;
 
     public static double pivot_kP = 0.00275;
-    public static double pivot_kD = 0.07;
+    public static double pivot_kD = 0.08;
     public static double pivot_target = 0;
     public static double pivot_lastError = 0;
-    public static double pivot_kG = 0.02;
-    public static double pivot_kG_slope = 0.00025; //i love lerp
-    public static double pivot_errorBound = 10;
+    public static double pivot_kG = 0.05;
+    public static double pivot_kG_slope = 0.0004; //i love lerp
+    public static double pivot_kS = 0.2;
+    public static double pivot_errorBound = 5;
     public boolean pivot_isReached = false;
     SplineInterpolator pivotAntiGrav;
 
@@ -106,6 +107,8 @@ public class PivotSlide extends Mechanism {
         double power = proportional + derivative;
         if(pivotAngle > 0) {
             power += antigravity;
+        }else if(slide_target != 0) {
+            power -= slide_kG_2 * Math.signum(error);
         }
         if(Math.abs(error) < slide_errorBound) {
             if(pivotAngle > 0) {
@@ -133,7 +136,7 @@ public class PivotSlide extends Mechanism {
         double derivative = (error - pivot_lastError) / time * pivot_kD;
         double antigravity = Math.cos(Math.toRadians(getPivotAngle())) * (pivot_kG + pivot_kG_slope * slide_target);
         double power = Range.clip(
-                proportional + derivative + antigravity,
+                proportional + derivative + antigravity + pivot_kS*Math.signum(error) * slide_target / MAX,
                 -1, 1);
         if(Math.abs(error) < pivot_errorBound) {
             power = antigravity;

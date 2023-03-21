@@ -56,7 +56,7 @@ public class Robot extends Mechanism {
             scoring.ready(PivotSlide.LOW);
         }
         if(pad.b && !isPressedB) {
-
+            ScoreMech.wristOverride = true;
         }
         if(pad.x && !isPressedX) {
             scoring.ready(PivotSlide.MID);

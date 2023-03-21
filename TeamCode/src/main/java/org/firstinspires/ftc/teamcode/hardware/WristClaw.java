@@ -13,12 +13,12 @@ public class WristClaw extends Mechanism {
     Servo claw, wrist;
 
     //Physical Constants
-    public static double MAX_WRIST_ANGLE = 47.8; //deg
-    public static double MIN_WRIST_ANGLE = -222.2;
+    public static double MAX_WRIST_ANGLE = 70; //deg
+    public static double MIN_WRIST_ANGLE = -200;
     public static double MAX_CLAW_POSITION = 0.5;
     public static double MIN_CLAW_POSITION = 0.32;
     public static double WRIST_PITCH = 10; //deg
-    public static double CONE_STACK_PITCH = 47.8; //deg
+    public static double CONE_STACK_PITCH = 70; //deg
 
     //Current Claw/Wrist position for hardware write optimization
     public double clawPos;
