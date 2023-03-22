@@ -49,7 +49,7 @@ public class PivotSlide extends Mechanism {
     public static double slide_target = 0;
     public static double slide_lastError = 0;
     public static double slide_errorBound = 10;
-    public static double slide_retractionMultiplier = 0.7;
+    public static double slide_retractionMultiplier = 0.2;
     public boolean slide_isReached = false;
 
     public static double pivot_kP = 0.00275;
@@ -59,7 +59,7 @@ public class PivotSlide extends Mechanism {
     public static double pivot_kG = 0.05;
     public static double pivot_kG_slope = 0.0004; //i love lerp
     public static double pivot_kS = 0.2;
-    public static double pivot_errorBound = 5;
+    public static double pivot_errorBound = 10;
     public boolean pivot_isReached = false;
     SplineInterpolator pivotAntiGrav;
 
@@ -114,11 +114,13 @@ public class PivotSlide extends Mechanism {
             if(pivotAngle > 0) {
                 power = antigravity;
             }
-            slide_isReached = true;
+            if(Math.abs(error) < slide_errorBound + 10) {
+                slide_isReached = true;
+            }
         }
         if(slide_target == 0) {
-            if(pivotAngle > 0) {
-                power *= (slide_retractionMultiplier + (1 - slide_retractionMultiplier) * Math.cos(pivotAngle));
+            if(pivotAngle > Math.toRadians(30)) {
+                power *= (slide_retractionMultiplier * Math.sin(pivotAngle));
             }else {
                 power += slide_kG_2;
             }
@@ -140,7 +142,9 @@ public class PivotSlide extends Mechanism {
                 -1, 1);
         if(Math.abs(error) < pivot_errorBound) {
             power = antigravity;
-            pivot_isReached = true;
+            if(Math.abs(error) < pivot_errorBound + 10) {
+                pivot_isReached = true;
+            }
         }
         pivot_lastError = error;
         pivotTimer.reset();

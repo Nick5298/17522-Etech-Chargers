@@ -53,28 +53,28 @@ public class AutoMech extends Mechanism {
         switch (currentState) {
             case PIVOT_PREP:
                 pivotSlide.setPivotAngle(pivotTarget); //setting the angle sets isReached to false
-                if(pivotSlide.isPivotReached()) { //isReached becomes true when the error is within a certain defined error bound
+                if(pivotSlide.pivot_isReached) { //isReached becomes true when the error is within a certain defined error bound
                     pivotSlide.resetSlide();
                     currentState = queuedState; //set FSM state to the state we want, either IDLE or GRAB
                 }
                 break;
             case SLIDE_PREP:
-                wristOverride = false;
                 pivotSlide.setSlideTarget(0); //we only ever come to this state from GRAB or IDLE, and we should retract before we pivot
-                if(pivotSlide.isSlideReached()) { //set to false when slide target is set, true when error is within bound
+                if(pivotSlide.slide_isReached) { //set to false when slide target is set, true when error is within bound
                     currentState = scoreStates.PIVOT_PREP; //time to turn the pivot
+                    wristOverride = false;
                 }
                 break;
             case READY:
                 pivotSlide.setSlideTarget(slideTarget); //eventually will become high/mid/low pole positions
-                if(pivotSlide.isSlideReached()) {
+                if(pivotSlide.slide_isReached) {
                     toggleClaw();
                     cone++;
                 }
                 break;
             case GRAB:
                 pivotSlide.setSlideTarget(PivotSlide.MAX); //intake cone from as far away as possible
-                if(pivotSlide.isSlideReached()) {
+                if(pivotSlide.slide_isReached) {
                     wristClaw.closeClaw();
                     clawTimer.reset();
                     currentState = scoreStates.CONE_PITCH;
@@ -95,6 +95,8 @@ public class AutoMech extends Mechanism {
             case CONE_PITCH:
                 if(clawTimer.milliseconds() >= pitchDelay) {
                     wristOverride = true;
+                    pivotSlide.setPivotAngle(pivotTarget+armRaise);
+                    pivotSlide.setSlideTarget(slideTarget-slideRetract);
                 }
                 if(clawTimer.milliseconds() >= raiseDelay) {
                     ready(PivotSlide.HIGH);
@@ -105,8 +107,6 @@ public class AutoMech extends Mechanism {
             wristClaw.wristPitch(-pivotSlide.getPivotAngle()); //wrist pitch for easier cone scoring
         }else if(wristOverride){
             wristClaw.coneStackPitch(); //conestack
-            pivotSlide.setSlideTarget(slideTarget-slideRetract);
-            pivotSlide.setPivotAngle(pivotTarget+armRaise);
         }else {
             wristClaw.setWristAngle(-pivotSlide.getPivotAngle()); //wireless 4 bar to keep wrist parallel to ground
         }
