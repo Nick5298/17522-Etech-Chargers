@@ -32,13 +32,13 @@ public class PivotSlide extends Mechanism {
 
     //Slide positions
     public static double MAX = 770;
-    public static double HIGH = 660;
+    public static double HIGH = 760;
     public static double LOW = 0;
     public static double MID = 335;
 
     //Pivot positions
     public static double GRAB_ANGLE = -7;
-    public static double TELEOP_SCORE_ANGLE = 135;
+    public static double TELEOP_SCORE_ANGLE = 100;
     public static double AUTO_SCORE_ANGLE = 135;
 
     //PID Stuff //kG interpolate it based on length
@@ -48,7 +48,7 @@ public class PivotSlide extends Mechanism {
     public static double slide_kG_2 = -0.15; //helps slides come back if angle < 0
     public static double slide_target = 0;
     public static double slide_lastError = 0;
-    public static double slide_errorBound = 15;
+    public static double slide_errorBound = 10;
     public static double slide_retractionMultiplier = 0.7;
     public boolean slide_isReached = false;
 
@@ -149,12 +149,12 @@ public class PivotSlide extends Mechanism {
 
     public boolean isSlideReached() {
         double error = slide_target - slide_currentPos;
-        return Math.abs(error) <= slide_errorBound;
+        return Math.abs(error) <= slide_errorBound+5;
     }
 
     public boolean isPivotReached() {
         double error = pivot_target - pivot_currentPos;
-        return Math.abs(error) <= pivot_errorBound;
+        return Math.abs(error) <= pivot_errorBound+10;
     }
 
     public void setSlidePower(double power) {
