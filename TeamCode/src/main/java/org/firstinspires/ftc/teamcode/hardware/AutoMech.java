@@ -24,7 +24,7 @@ public class AutoMech extends Mechanism {
 
     public static double dropDelay = 300;
     public static double pitchDelay = 300;
-    public static double raiseDelay = 800;
+    public static double raiseDelay = 400;
     public static double slideTarget = 0;
     public static double pivotTarget = 0;
 
