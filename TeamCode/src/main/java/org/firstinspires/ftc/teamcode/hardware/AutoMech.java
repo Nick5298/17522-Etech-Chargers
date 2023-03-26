@@ -117,7 +117,7 @@ public class AutoMech extends Mechanism {
         slideTarget = position;
         if(currentState != scoreStates.READY) {
             wristClaw.closeClaw();
-            pivotTarget = PivotSlide.TELEOP_SCORE_ANGLE;
+            pivotTarget = PivotSlide.AUTO_SCORE_ANGLE;
             queuedState = scoreStates.READY;
             currentState = scoreStates.SLIDE_PREP;
         }

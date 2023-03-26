@@ -38,8 +38,8 @@ public class PivotSlide extends Mechanism {
 
     //Pivot positions
     public static double GRAB_ANGLE = -7;
-    public static double TELEOP_SCORE_ANGLE = 100;
-    public static double AUTO_SCORE_ANGLE = 135;
+    public static double TELEOP_SCORE_ANGLE = 135;
+    public static double AUTO_SCORE_ANGLE = 110;
 
     //PID Stuff //kG interpolate it based on length
     public static double slide_kP = 0.005;
