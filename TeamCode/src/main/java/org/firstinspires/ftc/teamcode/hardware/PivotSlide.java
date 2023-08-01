@@ -37,9 +37,10 @@ public class PivotSlide extends Mechanism {
     public static double MID = 335;
 
     //Pivot positions
-    public static double GRAB_ANGLE = -7;
+    public static double GRAB_ANGLE = -12;
     public static double TELEOP_SCORE_ANGLE = 135;
-    public static double AUTO_SCORE_ANGLE = 110;
+    public static double AUTO_SCORE_ANGLE = 115;
+    public static double INTERMEDIATE_ANGLE = 70;
 
     //PID Stuff //kG interpolate it based on length
     public static double slide_kP = 0.005;
@@ -49,7 +50,7 @@ public class PivotSlide extends Mechanism {
     public static double slide_target = 0;
     public static double slide_lastError = 0;
     public static double slide_errorBound = 10;
-    public static double slide_retractionMultiplier = 0.2;
+    public static double slide_retractionMultiplier = 0.5;
     public boolean slide_isReached = false;
 
     public static double pivot_kP = 0.00275;
@@ -69,6 +70,7 @@ public class PivotSlide extends Mechanism {
         slide = hwMap.get(DcMotorEx.class, "slide");
         pivot = hwMap.get(DcMotorEx.class, "pivot");
         reset();
+        slide.setPower(-0.1);
         slideTimer.reset();
         pivotTimer.reset();
     }
@@ -119,8 +121,8 @@ public class PivotSlide extends Mechanism {
             }
         }
         if(slide_target == 0) {
-            if(pivotAngle > Math.toRadians(30)) {
-                power *= (slide_retractionMultiplier * Math.sin(pivotAngle));
+            if(pivotAngle > Math.toRadians(70)) {
+                power *= (slide_retractionMultiplier);
             }else {
                 power += slide_kG_2;
             }

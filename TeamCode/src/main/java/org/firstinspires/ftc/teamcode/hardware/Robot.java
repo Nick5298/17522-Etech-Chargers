@@ -76,7 +76,7 @@ public class Robot extends Mechanism {
         isPressedY = pad.y;
         isPressedLB = pad.left_bumper;
         isPressedRB = pad.right_bumper;
-        scoring.loop();
+        scoring.update();
     }
 
 }

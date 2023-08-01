@@ -81,6 +81,7 @@ public class newLeftAuto extends LinearOpMode {
 
         mech.init(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
+        drive.setPoseEstimate(new Pose2d(startX, startY, startAng));
 
         TrajectorySequence cycleSetup = drive.trajectorySequenceBuilder(new Pose2d(startX, startY, startAng))
                 .lineToLinearHeading(new Pose2d(-35, -22, (Math.toRadians(135))))

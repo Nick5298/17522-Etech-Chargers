@@ -45,6 +45,7 @@ public class AutoMech extends Mechanism {
     public void init(HardwareMap hwMap) {
         pivotSlide.init(hwMap);
         wristClaw.init(hwMap, -PivotSlide.PIVOT_START_ANGLE);
+        wristClaw.closeClaw();
         dropTimer.reset();
         currentState = scoreStates.IDLE;
     }
@@ -60,6 +61,9 @@ public class AutoMech extends Mechanism {
                 break;
             case SLIDE_PREP:
                 pivotSlide.setSlideTarget(0); //we only ever come to this state from GRAB or IDLE, and we should retract before we pivot
+                if(queuedState == scoreStates.GRAB) {
+                    pivotSlide.setPivotAngle(PivotSlide.INTERMEDIATE_ANGLE);
+                }
                 if(pivotSlide.slide_isReached) { //set to false when slide target is set, true when error is within bound
                     currentState = scoreStates.PIVOT_PREP; //time to turn the pivot
                     wristOverride = false;
